@@ -1,9 +1,6 @@
 FROM python:3.11-slim
 
 # Install system dependencies
-# - build-essential & curl: Required to install cmdstan
-# - procps: REQUIRED by Nextflow to monitor task execution (provides 'ps')
-# - tar & gzip: Required for the pipeline's COMPRESS_OUTPUT step
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
@@ -12,12 +9,14 @@ RUN apt-get update && apt-get install -y \
     gzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install the bipode Python package, cmdstanpy, and multiqc for the report generation
+# Install the bipode Python package, cmdstanpy, and multiqc
 RUN pip install --no-cache-dir bipode-httr cmdstanpy multiqc
 
-# Install cmdstan globally so the pipeline can compile the models
+# Install cmdstan globally 
 RUN install_cmdstan --dir /opt/cmdstan
-ENV CMDSTAN=/opt/cmdstan
+
+# Set CMDSTAN to the versioned directory (cmdstan installs to cmdstan-X.Y.Z subdirectory)
+ENV CMDSTAN=/opt/cmdstan/cmdstan-2.40.0
 
 # Default command
 CMD ["python"]
